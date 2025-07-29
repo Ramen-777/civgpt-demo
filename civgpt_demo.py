@@ -1,12 +1,10 @@
-
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from chromadb.config import Settings
 import openai
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -23,21 +21,14 @@ if query:
         docs = text_splitter.split_documents(pages)
 
         embeddings = OpenAIEmbeddings()
-
-        vectordb = Chroma.from_documents(
-    docs,
-    embedding=embeddings
-)
-
-
-        retriever = vectordb.as_retriever()
+        db = FAISS.from_documents(docs, embedding=embeddings)
+        retriever = db.as_retriever()
 
         qa_chain = RetrievalQA.from_chain_type(
             llm=ChatOpenAI(model_name="gpt-4"),
             chain_type="stuff",
-            retriever=retriever    
-
-)
+            retriever=retriever
+        )
 
         answer = qa_chain.run(query)
         st.success(answer)
