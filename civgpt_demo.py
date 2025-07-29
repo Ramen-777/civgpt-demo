@@ -29,6 +29,7 @@ vectordb = Chroma.from_documents(
     persist_directory="./chroma",
     client_settings=Settings(anonymized_telemetry=False, persist_directory="./chroma")
 )
+
         retriever = vectordb.as_retriever()
         qa_chain = RetrievalQA.from_chain_type(
             llm=ChatOpenAI(model_name="gpt-4"),
