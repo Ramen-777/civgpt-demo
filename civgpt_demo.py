@@ -20,8 +20,9 @@ if query:
         pages = loader.load()
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         docs = text_splitter.split_documents(pages)
-        embeddings = OpenAIEmbeddings()
-from chromadb.config import Settings
+      from chromadb.config import Settings
+
+embeddings = OpenAIEmbeddings()
 
 vectordb = Chroma.from_documents(
     docs,
@@ -30,11 +31,13 @@ vectordb = Chroma.from_documents(
     client_settings=Settings(anonymized_telemetry=False, persist_directory="./chroma")
 )
 
-        retriever = vectordb.as_retriever()
-        qa_chain = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(model_name="gpt-4"),
-            chain_type="stuff",
-            retriever=retriever
-        )
-        answer = qa_chain.run(query)
-        st.success(answer)
+retriever = vectordb.as_retriever()
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm=ChatOpenAI(model_name="gpt-4"),
+    chain_type="stuff",
+    retriever=retriever
+)
+
+answer = qa_chain.run(query)
+st.success(answer)
