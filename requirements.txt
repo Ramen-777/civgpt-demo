@@ -3,7 +3,7 @@ streamlit
 openai
 langchain
 langchain-community
-chromadb
+chromadb==0.4.13
 pypdf
 
 

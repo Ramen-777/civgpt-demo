@@ -21,7 +21,14 @@ if query:
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         docs = text_splitter.split_documents(pages)
         embeddings = OpenAIEmbeddings()
-        vectordb = Chroma.from_documents(docs, embedding=embeddings, persist_directory="./chroma")
+from chromadb.config import Settings
+
+vectordb = Chroma.from_documents(
+    docs,
+    embedding=embeddings,
+    persist_directory="./chroma",
+    client_settings=Settings(anonymized_telemetry=False, persist_directory="./chroma")
+)
         retriever = vectordb.as_retriever()
         qa_chain = RetrievalQA.from_chain_type(
             llm=ChatOpenAI(model_name="gpt-4"),
