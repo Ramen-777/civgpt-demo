@@ -6,6 +6,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from chromadb.config import Settings
 import openai
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -20,24 +21,24 @@ if query:
         pages = loader.load()
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         docs = text_splitter.split_documents(pages)
-      from chromadb.config import Settings
 
-embeddings = OpenAIEmbeddings()
+        embeddings = OpenAIEmbeddings()
 
-vectordb = Chroma.from_documents(
-    docs,
-    embedding=embeddings,
-    persist_directory="./chroma",
-    client_settings=Settings(anonymized_telemetry=False, persist_directory="./chroma")
+        vectordb = Chroma.from_documents(
+            docs,
+            embedding=embeddings,
+            persist_directory="./chroma",
+            client_settings=Settings(anonymized_telemetry=False, persist_directory="./chroma")
+        )
+
+        retriever = vectordb.as_retriever()
+
+        qa_chain = RetrievalQA.from_chain_type(
+            llm=ChatOpenAI(model_name="gpt-4"),
+            chain_type="stuff",
+            retriever=retriever    
+
 )
 
-retriever = vectordb.as_retriever()
-
-qa_chain = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(model_name="gpt-4"),
-    chain_type="stuff",
-    retriever=retriever
-)
-
-answer = qa_chain.run(query)
-st.success(answer)
+        answer = qa_chain.run(query)
+        st.success(answer)
