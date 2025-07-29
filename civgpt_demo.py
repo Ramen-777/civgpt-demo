@@ -25,11 +25,10 @@ if query:
         embeddings = OpenAIEmbeddings()
 
         vectordb = Chroma.from_documents(
-            docs,
-            embedding=embeddings,
-            persist_directory="./chroma",
-            client_settings=Settings(anonymized_telemetry=False, persist_directory="./chroma")
-        )
+    docs,
+    embedding=embeddings
+)
+
 
         retriever = vectordb.as_retriever()
 
